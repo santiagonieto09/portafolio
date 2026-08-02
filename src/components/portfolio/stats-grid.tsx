@@ -1,8 +1,10 @@
 import { Archive, GitFork, Rocket, Star, Zap, FolderGit2 } from "lucide-react";
 import type { PortfolioStats } from "@/domain/github/types";
-import { formatNumber, formatRelative } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
+import { useRelativeTime } from "@/hooks/use-relative-time";
 
 export function StatsGrid({ stats }: { stats: PortfolioStats }) {
+  const lastSynced = useRelativeTime(stats.lastSyncedAt);
   const items = [
     { icon: FolderGit2, label: "Repositorios", value: stats.totalRepos },
     { icon: Star, label: "Estrellas", value: stats.totalStars },
@@ -24,7 +26,7 @@ export function StatsGrid({ stats }: { stats: PortfolioStats }) {
           </p>
         </div>
         <span className="skeu-chip shrink-0">
-          Sincronizado {formatRelative(stats.lastSyncedAt)}
+          Sincronizado {lastSynced}
         </span>
       </div>
 

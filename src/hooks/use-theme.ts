@@ -1,18 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 type Theme = "light" | "dark";
 const STORAGE_KEY = "portfolio-theme";
 
+// La clase inicial la aplica un script inline en el <head> (ver __root.tsx),
+// así el estado se inicializa en cliente con lo que ya pintó el navegador.
 export function useTheme() {
-  const [theme, setTheme] = useState<Theme>("light");
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
-    const preferred: Theme =
-      stored ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-    setTheme(preferred);
-    document.documentElement.classList.toggle("dark", preferred === "dark");
-  }, []);
+  const [theme, setTheme] = useState<Theme>(() =>
+    typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+      ? "dark"
+      : "light",
+  );
 
   const toggle = useCallback(() => {
     const next: Theme =

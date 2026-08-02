@@ -90,6 +90,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:locale", content: "es_CO" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    scripts: [
+      {
+        // Aplica el tema antes del primer paint para evitar el flash de modo claro.
+        children: `(function(){try{var t=localStorage.getItem("portfolio-theme");var d=t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d)}catch(e){}})();`,
+      },
+    ],
     links: [
       {
         rel: "stylesheet",

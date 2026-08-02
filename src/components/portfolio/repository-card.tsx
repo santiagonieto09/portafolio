@@ -12,13 +12,15 @@ import {
 } from "lucide-react";
 import type { Repository } from "@/domain/github/types";
 import { languageColor } from "@/domain/github/language-colors";
-import { formatDate, formatRelative } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { docsUrlFor } from "@/lib/docs-url";
+import { useRelativeTime } from "@/hooks/use-relative-time";
 
 export function RepositoryCard({ repo }: { repo: Repository }) {
   const languages = Object.keys(repo.languages);
   const [expanded, setExpanded] = useState(false);
   const docsUrl = docsUrlFor(repo.htmlUrl);
+  const updatedAgo = useRelativeTime(repo.pushedAt);
   const description = repo.description ?? "Sin descripción publicada en GitHub.";
   const isLong = description.length > 110;
 
@@ -89,7 +91,7 @@ export function RepositoryCard({ repo }: { repo: Repository }) {
         <div className="flex items-center gap-1.5">
           <History className="size-3.5 shrink-0" aria-hidden="true" />
           <dt className="sr-only">Última actualización</dt>
-          <dd className="truncate">Actualizado {formatRelative(repo.pushedAt)}</dd>
+          <dd className="truncate">Actualizado {updatedAgo}</dd>
         </div>
         <div className="flex items-center gap-1.5">
           <Star className="size-3.5 shrink-0" aria-hidden="true" />
