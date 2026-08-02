@@ -5,9 +5,9 @@ import { renderErrorPage } from "./lib/error-page";
 const SECURITY_HEADERS = {
   "Content-Security-Policy":
     "default-src 'self'; script-src 'self' 'unsafe-inline'; " +
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+    "style-src 'self' 'unsafe-inline'; " +
     "img-src 'self' data: https://avatars.githubusercontent.com https://*.githubusercontent.com; " +
-    "font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; " +
+    "font-src 'self' data:; connect-src 'self'; " +
     "frame-ancestors 'self'; base-uri 'self'; form-action 'self'",
   "X-Content-Type-Options": "nosniff",
   "X-Frame-Options": "SAMEORIGIN",

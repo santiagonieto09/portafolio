@@ -13,12 +13,15 @@ import type {
 } from "@/domain/github/types";
 import { languageColor } from "@/domain/github/language-colors";
 import { detectTechnologies } from "@/domain/github/technology-detection";
+import {
+  readSnapshot,
+  readSnapshotOrStale,
+  writeSnapshot,
+  invalidateSnapshot,
+} from "./snapshot-cache";
 
 const API = "https://api.github.com";
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-
-/** In-memory snapshot cache: the weekly sync window for a warm worker. */
-let cache: { at: number; value: PortfolioSnapshot } | null = null;
+const CONCURRENCY = 3;
 
 function headers(): Record<string, string> {
   const h: Record<string, string> = {
@@ -122,9 +125,11 @@ function branchFrom(event: Record<string, any>): string | null {
 
 
 async function buildRepository(raw: Record<string, any>): Promise<Repository> {
+  // Fail fast (attempts=1): si GitHub limita la tasa en estas llamadas por repo,
+  // se degrada a los datos básicos en lugar de encadenar reintentos lentos.
   const [languagesRaw, releaseRaw] = await Promise.all([
-    get<Record<string, number>>(`/repos/${raw.full_name}/languages`),
-    get<Record<string, any>>(`/repos/${raw.full_name}/releases/latest`),
+    get<Record<string, number>>(`/repos/${raw.full_name}/languages`, 1),
+    get<Record<string, any>>(`/repos/${raw.full_name}/releases/latest`, 1),
   ]);
 
   const languages = languagesRaw ?? (raw.language ? { [raw.language as string]: 1 } : {});
@@ -250,8 +255,8 @@ function degradedSnapshot(username: string): PortfolioSnapshot {
 }
 
 export async function fetchPortfolio(username: string): Promise<PortfolioSnapshot> {
-
-  if (cache && Date.now() - cache.at < WEEK_MS) return cache.value;
+  const cached = await readSnapshot();
+  if (cached) return cached;
 
   const [user, reposRaw, socialRaw, eventsRaw] = await Promise.all([
     get<Record<string, any>>(`/users/${username}`),
@@ -263,13 +268,14 @@ export async function fetchPortfolio(username: string): Promise<PortfolioSnapsho
   if (!user) {
     // GitHub no respondió (normalmente límite de peticiones): servimos el último
     // snapshot conocido o un estado degradado, nunca un error que rompa la página.
-    if (cache) return cache.value;
+    const stale = await readSnapshotOrStale();
+    if (stale) return stale;
     return degradedSnapshot(username);
   }
 
 
   const rawRepos = (reposRaw ?? []).filter((r) => !r.fork);
-  const repositories = await mapLimit(rawRepos, 6, buildRepository);
+  const repositories = await mapLimit(rawRepos, CONCURRENCY, buildRepository);
 
   const profile: Profile = {
     login: user.login,
@@ -321,11 +327,11 @@ export async function fetchPortfolio(username: string): Promise<PortfolioSnapsho
     },
   };
 
-  if (!snapshot.degraded) cache = { at: Date.now(), value: snapshot };
+  if (!snapshot.degraded) await writeSnapshot(snapshot);
   return snapshot;
 }
 
 /** Forces the weekly sync to refetch on the next read. */
 export function invalidatePortfolioCache() {
-  cache = null;
+  invalidateSnapshot();
 }
