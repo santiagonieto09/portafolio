@@ -3,7 +3,7 @@
  * Requiere el secreto compartido CRON_SECRET (header `x-cron-secret`
  * o `Authorization: Bearer <secreto>`).
  * Programar con GitHub Actions / Vercel Cron:
- *   0 6 * * 1  ->  GET /api/public/sync  (con el header del secreto)
+ *   0 6 * * 1  ->  POST /api/public/sync  (con el header del secreto)
  */
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
@@ -22,7 +22,7 @@ function safeEqual(a: string, b: string): boolean {
 export const Route = createFileRoute("/api/public/sync")({
   server: {
     handlers: {
-      GET: async ({ request }) => {
+      POST: async ({ request }) => {
         const json = (body: unknown, status = 200) =>
           new Response(JSON.stringify(body), {
             status,

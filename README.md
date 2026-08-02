@@ -90,7 +90,7 @@ El portafolio consulta la API de GitHub en cada carga y mantiene una caché en m
 
 ```bash
 # Ejemplo de programación: lunes a las 06:00
-0 6 * * 1  curl -X GET https://<dominio>/api/public/sync -H "x-cron-secret: $CRON_SECRET"
+0 6 * * 1  curl -X POST https://<dominio>/api/public/sync -H "x-cron-secret: $CRON_SECRET"
 ```
 
 ## Licencia

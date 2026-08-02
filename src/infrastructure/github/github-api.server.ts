@@ -63,12 +63,27 @@ async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) => Promis
   return out;
 }
 
+const SAFE_PROTOCOLS = new Set(["http:", "https:"]);
+
+/** Keeps only http(s) URLs; anything else (javascript:, data:, …) is dropped. */
+function safeExternalUrl(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const withScheme = /^[a-z][a-z0-9+.-]*:/i.test(value) ? value : `https://${value}`;
+  try {
+    const parsed = new URL(withScheme);
+    return SAFE_PROTOCOLS.has(parsed.protocol) ? parsed.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 function socialsFrom(user: Record<string, any>, extra: Array<Record<string, any>>): SocialLink[] {
   const links: SocialLink[] = [
     { kind: "github", label: "GitHub", url: user.html_url as string },
   ];
   const push = (url: string) => {
-    const u = url.startsWith("http") ? url : `https://${url}`;
+    const u = safeExternalUrl(url);
+    if (!u) return;
     const host = u.replace(/^https?:\/\/(www\.)?/, "").split("/")[0];
     const map: Array<[RegExp, SocialLink["kind"], string]> = [
       [/linkedin\./, "linkedin", "LinkedIn"],
@@ -135,7 +150,7 @@ async function buildRepository(raw: Record<string, any>): Promise<Repository> {
     name: raw.name,
     description: raw.description ?? null,
     htmlUrl: raw.html_url,
-    homepage: raw.homepage ? String(raw.homepage) : null,
+    homepage: safeExternalUrl(raw.homepage),
     language: raw.language ?? null,
     languages,
     technologies,
