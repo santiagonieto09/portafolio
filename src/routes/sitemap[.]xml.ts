@@ -7,13 +7,20 @@ interface SitemapEntry {
   priority?: string;
 }
 
+function stripTrailingSlashes(value: string): string {
+  let end = value.length;
+  while (end > 0 && value.charCodeAt(end - 1) === 47 /* "/" */) end--;
+  return value.slice(0, end);
+}
+
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async ({ request }) => {
         // SITE_URL permite fijar el dominio (p. ej. tras el deploy); si no está
         // definida se deriva del origin de la propia petición.
-        const baseUrl = process.env.SITE_URL?.replace(/\/+$/, "") ?? new URL(request.url).origin;
+        const siteUrl = process.env.SITE_URL;
+        const baseUrl = siteUrl ? stripTrailingSlashes(siteUrl) : new URL(request.url).origin;
         const entries: SitemapEntry[] = [{ path: "/", changefreq: "weekly", priority: "1.0" }];
 
         const urls = entries.map((e) =>

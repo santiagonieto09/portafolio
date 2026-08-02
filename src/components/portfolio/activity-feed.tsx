@@ -2,7 +2,7 @@ import { Activity, ExternalLink } from "lucide-react";
 import type { ActivityItem } from "@/domain/github/types";
 import { useRelativeTime } from "@/hooks/use-relative-time";
 
-function ActivityRow({ item }: { item: ActivityItem }) {
+function ActivityRow({ item }: Readonly<{ item: ActivityItem }>) {
   const timeAgo = useRelativeTime(item.createdAt);
 
   return (

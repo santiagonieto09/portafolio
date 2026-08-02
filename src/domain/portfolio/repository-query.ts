@@ -69,10 +69,14 @@ export function applyQuery(repos: Repository[], query: RepositoryQuery): Reposit
 }
 
 export function collectLanguages(repos: Repository[]): string[] {
-  return [...new Set(repos.flatMap((r) => Object.keys(r.languages)))].sort();
+  return [...new Set(repos.flatMap((r) => Object.keys(r.languages)))].sort((a, b) =>
+    a.localeCompare(b),
+  );
 }
 
 export function collectTechnologies(repos: Repository[]): string[] {
   const languages = new Set(collectLanguages(repos));
-  return [...new Set(repos.flatMap((r) => r.technologies))].filter((t) => !languages.has(t)).sort();
+  return [...new Set(repos.flatMap((r) => r.technologies))]
+    .filter((t) => !languages.has(t))
+    .sort((a, b) => a.localeCompare(b));
 }
