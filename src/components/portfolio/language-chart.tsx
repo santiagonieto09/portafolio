@@ -70,12 +70,7 @@ export function LanguageChart({ languages }: { languages: LanguageSlice[] }) {
             >
               {top.percentage}%
             </text>
-            <text
-              x="50%"
-              y="58%"
-              textAnchor="middle"
-              className="fill-muted-foreground text-[11px]"
-            >
+            <text x="50%" y="58%" textAnchor="middle" className="fill-muted-foreground text-[11px]">
               {top.name}
             </text>
           </svg>
@@ -103,7 +98,10 @@ export function LanguageChart({ languages }: { languages: LanguageSlice[] }) {
               <div className="skeu-inset h-3 overflow-hidden rounded-full">
                 <div
                   className="h-full rounded-full transition-[width] duration-700"
-                  style={{ width: `${Math.max(lang.percentage, 1.5)}%`, backgroundColor: lang.color }}
+                  style={{
+                    width: `${Math.max(lang.percentage, 1.5)}%`,
+                    backgroundColor: lang.color,
+                  }}
                 />
               </div>
             </li>

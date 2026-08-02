@@ -13,8 +13,7 @@ export function useTheme() {
   );
 
   const toggle = useCallback(() => {
-    const next: Theme =
-      document.documentElement.classList.contains("dark") ? "light" : "dark";
+    const next: Theme = document.documentElement.classList.contains("dark") ? "light" : "dark";
 
     const apply = () => {
       document.documentElement.classList.toggle("dark", next === "dark");

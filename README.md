@@ -68,21 +68,21 @@ Abre `http://localhost:5173` para ver el proyecto en desarrollo.
 
 ## Variables de entorno
 
-| Variable | Descripción | Requerida |
-| --- | --- | --- |
-| `GITHUB_TOKEN` | Token personal de GitHub para evitar el límite de peticiones | No |
-| `CRON_SECRET` | Secreto compartido para proteger el endpoint `/api/public/sync` | No |
+| Variable       | Descripción                                                     | Requerida |
+| -------------- | --------------------------------------------------------------- | --------- |
+| `GITHUB_TOKEN` | Token personal de GitHub para evitar el límite de peticiones    | No        |
+| `CRON_SECRET`  | Secreto compartido para proteger el endpoint `/api/public/sync` | No        |
 
 ## Scripts
 
-| Comando | Descripción |
-| --- | --- |
-| `bun run dev` | Inicia el servidor de desarrollo |
-| `bun run build` | Compila el proyecto para producción |
-| `bun run build:dev` | Compila en modo desarrollo |
-| `bun run preview` | Previsualiza la build de producción |
-| `bun run lint` | Ejecuta ESLint |
-| `bun run format` | Formatea el código con Prettier |
+| Comando             | Descripción                         |
+| ------------------- | ----------------------------------- |
+| `bun run dev`       | Inicia el servidor de desarrollo    |
+| `bun run build`     | Compila el proyecto para producción |
+| `bun run build:dev` | Compila en modo desarrollo          |
+| `bun run preview`   | Previsualiza la build de producción |
+| `bun run lint`      | Ejecuta ESLint                      |
+| `bun run format`    | Formatea el código con Prettier     |
 
 ## Sincronización con GitHub
 

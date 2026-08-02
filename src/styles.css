@@ -352,5 +352,3 @@ html[data-theme-sweep="to-light"]::view-transition-new(root) {
     animation: none;
   }
 }
-
-

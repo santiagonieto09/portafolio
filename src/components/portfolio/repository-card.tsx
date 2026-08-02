@@ -120,7 +120,6 @@ export function RepositoryCard({ repo }: { repo: Repository }) {
         </div>
       )}
 
-
       <footer className="mt-auto flex flex-wrap gap-2 pt-1">
         <a
           href={repo.htmlUrl}

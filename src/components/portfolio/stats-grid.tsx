@@ -25,9 +25,7 @@ export function StatsGrid({ stats }: { stats: PortfolioStats }) {
             Calculadas en vivo desde la API pública de GitHub.
           </p>
         </div>
-        <span className="skeu-chip shrink-0">
-          Sincronizado {lastSynced}
-        </span>
+        <span className="skeu-chip shrink-0">Sincronizado {lastSynced}</span>
       </div>
 
       <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">

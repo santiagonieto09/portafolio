@@ -16,7 +16,10 @@ function ActivityRow({ item }: { item: ActivityItem }) {
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <time dateTime={item.createdAt} className="hidden text-xs text-muted-foreground sm:inline">
+          <time
+            dateTime={item.createdAt}
+            className="hidden text-xs text-muted-foreground sm:inline"
+          >
             {timeAgo}
           </time>
           <a
@@ -42,7 +45,11 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
   if (items.length === 0) return null;
 
   return (
-    <section id="actividad" aria-labelledby="activity-title" className="skeu-surface rounded-4xl p-6">
+    <section
+      id="actividad"
+      aria-labelledby="activity-title"
+      className="skeu-surface rounded-4xl p-6"
+    >
       <h2 id="activity-title" className="flex items-center gap-2 text-2xl font-bold sm:text-3xl">
         <Activity className="size-6 text-accent" aria-hidden="true" />
         Actividad reciente

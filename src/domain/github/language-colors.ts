@@ -31,15 +31,7 @@ const COLORS: Record<string, string> = {
   Objective_C: "#438eff",
 };
 
-const FALLBACK = [
-  "#6e7781",
-  "#8250df",
-  "#0969da",
-  "#1a7f37",
-  "#bf8700",
-  "#cf222e",
-  "#bc4c00",
-];
+const FALLBACK = ["#6e7781", "#8250df", "#0969da", "#1a7f37", "#bf8700", "#cf222e", "#bc4c00"];
 
 export function languageColor(name: string): string {
   if (COLORS[name]) return COLORS[name];

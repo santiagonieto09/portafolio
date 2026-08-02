@@ -42,7 +42,6 @@ export interface ReleaseInfo {
   url: string;
 }
 
-
 export interface Repository {
   id: number;
   name: string;
@@ -65,7 +64,6 @@ export interface Repository {
   hasPages: boolean;
   license: string | null;
   release: ReleaseInfo | null;
-  
 }
 
 export interface LanguageSlice {

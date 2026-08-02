@@ -10,11 +10,7 @@ import {
   Search,
   SlidersHorizontal,
 } from "lucide-react";
-import type {
-  RepositoryQuery,
-  SortDirection,
-  SortKey,
-} from "@/domain/portfolio/repository-query";
+import type { RepositoryQuery, SortDirection, SortKey } from "@/domain/portfolio/repository-query";
 import {
   Select,
   SelectContent,
@@ -97,12 +93,15 @@ export function RepositoryFilters({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Select
-          value={query.sort}
-          onValueChange={(value) => onChange({ sort: value as SortKey })}
-        >
-          <SelectTrigger className={`${controlClass} w-auto min-w-[9.5rem]`} aria-label="Ordenar proyectos">
-            <SlidersHorizontal className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+        <Select value={query.sort} onValueChange={(value) => onChange({ sort: value as SortKey })}>
+          <SelectTrigger
+            className={`${controlClass} w-auto min-w-[9.5rem]`}
+            aria-label="Ordenar proyectos"
+          >
+            <SlidersHorizontal
+              className="size-3.5 shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
             <SelectValue />
           </SelectTrigger>
           <SelectContent className={contentClass}>
@@ -118,11 +117,20 @@ export function RepositoryFilters({
           value={query.direction}
           onValueChange={(value) => onChange({ direction: value as SortDirection })}
         >
-          <SelectTrigger className={`${controlClass} w-auto min-w-[9.5rem]`} aria-label="Dirección del orden">
+          <SelectTrigger
+            className={`${controlClass} w-auto min-w-[9.5rem]`}
+            aria-label="Dirección del orden"
+          >
             {query.direction === "asc" ? (
-              <ArrowUpWideNarrow className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <ArrowUpWideNarrow
+                className="size-3.5 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
             ) : (
-              <ArrowDownWideNarrow className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <ArrowDownWideNarrow
+                className="size-3.5 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
             )}
             <SelectValue />
           </SelectTrigger>
@@ -140,7 +148,10 @@ export function RepositoryFilters({
             value={query.language ?? ALL}
             onValueChange={(value) => onChange({ language: value === ALL ? null : value })}
           >
-            <SelectTrigger className={`${controlClass} w-auto min-w-[8.5rem] max-w-[13rem]`} aria-label="Filtrar por lenguaje">
+            <SelectTrigger
+              className={`${controlClass} w-auto min-w-[8.5rem] max-w-[13rem]`}
+              aria-label="Filtrar por lenguaje"
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent className={contentClass}>
@@ -161,7 +172,10 @@ export function RepositoryFilters({
             value={query.technology ?? ALL}
             onValueChange={(value) => onChange({ technology: value === ALL ? null : value })}
           >
-            <SelectTrigger className={`${controlClass} w-auto min-w-[9rem] max-w-[13rem]`} aria-label="Filtrar por framework">
+            <SelectTrigger
+              className={`${controlClass} w-auto min-w-[9rem] max-w-[13rem]`}
+              aria-label="Filtrar por framework"
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent className={contentClass}>
