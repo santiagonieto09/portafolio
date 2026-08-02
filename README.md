@@ -72,6 +72,7 @@ Abre `http://localhost:5173` para ver el proyecto en desarrollo.
 | -------------- | --------------------------------------------------------------- | --------- |
 | `GITHUB_TOKEN` | Token personal de GitHub para evitar el límite de peticiones    | No        |
 | `CRON_SECRET`  | Secreto compartido para proteger el endpoint `/api/public/sync` | No        |
+| `SITE_URL`     | URL canónica del sitio (para sitemap y metadatos)               | No        |
 
 ## Scripts
 
@@ -86,12 +87,32 @@ Abre `http://localhost:5173` para ver el proyecto en desarrollo.
 
 ## Sincronización con GitHub
 
-El portafolio consulta la API de GitHub en cada carga y mantiene una caché en memoria. Para forzar la actualización semanalmente existe el endpoint protegido `GET /api/public/sync`, configurable con un cron:
+El portafolio consulta la API de GitHub en cada carga y mantiene una caché en memoria. Para forzar la actualización semanalmente existe el endpoint protegido `POST /api/public/sync`, configurable con un cron:
 
 ```bash
 # Ejemplo de programación: lunes a las 06:00
 0 6 * * 1  curl -X POST https://<dominio>/api/public/sync -H "x-cron-secret: $CRON_SECRET"
 ```
+
+> Nota: el endpoint solo acepta `POST` y exige la cabecera `x-cron-secret`. Vercel Cron no puede enviar cabeceras personalizadas, por lo que para programarlo se recomienda un [GitHub Actions workflow](https://docs.github.com/actions) con un `curl` como el de arriba.
+
+## Despliegue en Vercel
+
+La aplicación usa renderizado en servidor (TanStack Start + Nitro), por lo que necesita un host con runtime de servidor. El preset `vercel` de Nitro genera la [Build Output API](https://vercel.com/docs/build-output-api) (`.vercel/output`) durante `bun run build`; Vercel sirve los estáticos y ejecuta el resto como una serverless function.
+
+1. Sube el repositorio a GitHub y conéctalo en [Vercel](https://vercel.com/new).
+2. Verifica la configuración del proyecto (o ajústala en `vercel.json`):
+   - **Framework preset:** `Other` (`framework: null`).
+   - **Install command:** `bun install`.
+   - **Build command:** `bun run build`.
+   - **Output directory:** se detecta automáticamente (Build Output API, no la configures manualmente).
+3. Añade las variables de entorno en Vercel (Project → Settings → Environment Variables):
+   - `GITHUB_TOKEN` — evita el límite de peticiones a la API de GitHub.
+   - `CRON_SECRET` — para proteger el endpoint de sincronización.
+   - `SITE_URL` — la URL canónica final, p. ej. `https://santiagonieto.vercel.app`.
+4. Despliega. Cada push a `main` genera un nuevo deployment.
+
+Los encabezados de seguridad (CSP, HSTS, etc.) se aplican en tiempo de ejecución desde `src/start.ts`, por lo que no se configuran en `vercel.json`. En Vercel la caché del snapshot usa memoria en lugar de la Cache API de Cloudflare; con `GITHUB_TOKEN` configurado el límite de peticiones no es un problema.
 
 ## Licencia
 
