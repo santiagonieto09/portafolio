@@ -1,6 +1,7 @@
 import { Building2, CalendarDays, FolderGit2, MapPin, Users } from "lucide-react";
 import type { Profile } from "@/domain/github/types";
 import { formatDate, formatNumber } from "@/lib/format";
+import { CONTACT_EMAIL } from "@/lib/constants";
 import { SocialButtons } from "./social-buttons";
 
 interface Fact {
@@ -83,7 +84,7 @@ export function ProfileHero({ profile }: { profile: Profile }) {
               {
                 kind: "email" as const,
                 label: "Gmail",
-                url: "https://mail.google.com/mail/?view=cm&fs=1&to=santiago.nieto09@gmail.com",
+                url: `https://mail.google.com/mail/?view=cm&fs=1&to=${CONTACT_EMAIL}`,
               },
             ]}
           />

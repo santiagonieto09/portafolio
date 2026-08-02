@@ -61,7 +61,7 @@ export function applyQuery(repos: Repository[], query: RepositoryQuery): Reposit
     updated: (a, b) => +new Date(b.pushedAt) - +new Date(a.pushedAt),
     created: (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt),
     stars: (a, b) => b.stars - a.stars,
-    name: (a, b) => a.name.localeCompare(b.name),
+    name: (a, b) => b.name.localeCompare(a.name),
   };
 
   const factor = query.direction === "asc" ? -1 : 1;
@@ -74,7 +74,5 @@ export function collectLanguages(repos: Repository[]): string[] {
 
 export function collectTechnologies(repos: Repository[]): string[] {
   const languages = new Set(collectLanguages(repos));
-  return [...new Set(repos.flatMap((r) => r.technologies))]
-    .filter((t) => !languages.has(t))
-    .sort();
+  return [...new Set(repos.flatMap((r) => r.technologies))].filter((t) => !languages.has(t)).sort();
 }

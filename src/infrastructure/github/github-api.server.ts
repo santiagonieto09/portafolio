@@ -13,6 +13,14 @@ import type {
 } from "@/domain/github/types";
 import { languageColor } from "@/domain/github/language-colors";
 import { detectTechnologies } from "@/domain/github/technology-detection";
+import type {
+  GitHubEvent,
+  GitHubLanguages,
+  GitHubRelease,
+  GitHubRepo,
+  GitHubSocialAccount,
+  GitHubUser,
+} from "./github-api-types";
 import {
   readSnapshot,
   readSnapshotOrStale,
@@ -51,8 +59,11 @@ async function get<T>(path: string, attempts = 3): Promise<T | null> {
   return null;
 }
 
-
-async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) => Promise<R>): Promise<R[]> {
+async function mapLimit<T, R>(
+  items: T[],
+  limit: number,
+  fn: (item: T) => Promise<R>,
+): Promise<R[]> {
   const out: R[] = new Array(items.length);
   let index = 0;
   await Promise.all(
@@ -80,10 +91,8 @@ function safeExternalUrl(value: string | null | undefined): string | null {
   }
 }
 
-function socialsFrom(user: Record<string, any>, extra: Array<Record<string, any>>): SocialLink[] {
-  const links: SocialLink[] = [
-    { kind: "github", label: "GitHub", url: user.html_url as string },
-  ];
+function socialsFrom(user: GitHubUser, extra: GitHubSocialAccount[]): SocialLink[] {
+  const links: SocialLink[] = [{ kind: "github", label: "GitHub", url: user.html_url }];
   const push = (url: string) => {
     const u = safeExternalUrl(url);
     if (!u) return;
@@ -104,9 +113,9 @@ function socialsFrom(user: Record<string, any>, extra: Array<Record<string, any>
     );
   };
 
-  if (user.blog) push(user.blog as string);
+  if (user.blog) push(user.blog);
   if (user.twitter_username) push(`https://x.com/${user.twitter_username}`);
-  for (const account of extra) if (account?.url) push(account.url as string);
+  for (const account of extra) push(account.url);
   if (user.email) {
     links.push({ kind: "email", label: "Email", url: `mailto:${user.email}` });
   }
@@ -115,24 +124,23 @@ function socialsFrom(user: Record<string, any>, extra: Array<Record<string, any>
   return links.filter((l) => (seen.has(l.url) ? false : (seen.add(l.url), true)));
 }
 
-function branchFrom(event: Record<string, any>): string | null {
-  const ref: string | undefined = event.payload?.ref;
+function branchFrom(event: GitHubEvent): string | null {
+  const ref = event.payload?.ref;
   if (event.type === "PushEvent" && ref) return ref.replace(/^refs\/heads\//, "");
   if (event.type === "CreateEvent" && event.payload?.ref_type === "branch" && ref) return ref;
   if (event.type === "PullRequestEvent") return event.payload?.pull_request?.base?.ref ?? null;
   return null;
 }
 
-
-async function buildRepository(raw: Record<string, any>): Promise<Repository> {
+async function buildRepository(raw: GitHubRepo): Promise<Repository> {
   // Fail fast (attempts=1): si GitHub limita la tasa en estas llamadas por repo,
   // se degrada a los datos básicos en lugar de encadenar reintentos lentos.
   const [languagesRaw, releaseRaw] = await Promise.all([
-    get<Record<string, number>>(`/repos/${raw.full_name}/languages`, 1),
-    get<Record<string, any>>(`/repos/${raw.full_name}/releases/latest`, 1),
+    get<GitHubLanguages>(`/repos/${raw.full_name}/languages`, 1),
+    get<GitHubRelease>(`/repos/${raw.full_name}/releases/latest`, 1),
   ]);
 
-  const languages = languagesRaw ?? (raw.language ? { [raw.language as string]: 1 } : {});
+  const languages = languagesRaw ?? (raw.language ? { [raw.language]: 1 } : {});
   const technologies = detectTechnologies({
     name: raw.name,
     description: raw.description,
@@ -143,10 +151,10 @@ async function buildRepository(raw: Record<string, any>): Promise<Repository> {
 
   const release: ReleaseInfo | null = releaseRaw
     ? {
-        name: (releaseRaw.name as string) || (releaseRaw.tag_name as string),
-        tag: releaseRaw.tag_name as string,
-        publishedAt: (releaseRaw.published_at as string) ?? null,
-        url: releaseRaw.html_url as string,
+        name: releaseRaw.name || releaseRaw.tag_name,
+        tag: releaseRaw.tag_name,
+        publishedAt: releaseRaw.published_at ?? null,
+        url: releaseRaw.html_url,
       }
     : null;
 
@@ -197,7 +205,7 @@ function computeLanguages(repos: Repository[]): LanguageSlice[] {
     .slice(0, 8);
 }
 
-function describeEvent(event: Record<string, any>): string {
+function describeEvent(event: GitHubEvent): string {
   switch (event.type) {
     case "PushEvent":
       return `${event.payload?.commits?.length ?? 1} commit(s) publicados`;
@@ -214,7 +222,7 @@ function describeEvent(event: Record<string, any>): string {
     case "IssuesEvent":
       return `Issue ${event.payload?.action ?? "actualizado"}`;
     default:
-      return event.type?.replace(/Event$/, "") ?? "Actividad";
+      return event.type.replace(/Event$/, "") ?? "Actividad";
   }
 }
 
@@ -234,9 +242,7 @@ function degradedSnapshot(username: string): PortfolioSnapshot {
       following: 0,
       createdAt: new Date().toISOString(),
       htmlUrl: `https://github.com/${username}`,
-      socials: [
-        { kind: "github", label: "GitHub", url: `https://github.com/${username}` },
-      ],
+      socials: [{ kind: "github", label: "GitHub", url: `https://github.com/${username}` }],
     },
     repositories: [],
     activity: [],
@@ -259,10 +265,10 @@ export async function fetchPortfolio(username: string): Promise<PortfolioSnapsho
   if (cached) return cached;
 
   const [user, reposRaw, socialRaw, eventsRaw] = await Promise.all([
-    get<Record<string, any>>(`/users/${username}`),
-    get<Array<Record<string, any>>>(`/users/${username}/repos?per_page=100&sort=updated`),
-    get<Array<Record<string, any>>>(`/users/${username}/social_accounts`),
-    get<Array<Record<string, any>>>(`/users/${username}/events/public?per_page=30`),
+    get<GitHubUser>(`/users/${username}`),
+    get<GitHubRepo[]>(`/users/${username}/repos?per_page=100&sort=updated`),
+    get<GitHubSocialAccount[]>(`/users/${username}/social_accounts`),
+    get<GitHubEvent[]>(`/users/${username}/events/public?per_page=30`),
   ]);
 
   if (!user) {
@@ -272,7 +278,6 @@ export async function fetchPortfolio(username: string): Promise<PortfolioSnapsho
     if (stale) return stale;
     return degradedSnapshot(username);
   }
-
 
   const rawRepos = (reposRaw ?? []).filter((r) => !r.fork);
   const repositories = await mapLimit(rawRepos, CONCURRENCY, buildRepository);
@@ -298,7 +303,7 @@ export async function fetchPortfolio(username: string): Promise<PortfolioSnapsho
     const repoName = event.repo?.name ?? "";
     const branch = branchFrom(event);
     return {
-      id: String(event.id),
+      id: event.id,
       type: event.type,
       repoName,
       repoUrl: branch

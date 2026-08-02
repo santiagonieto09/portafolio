@@ -7,6 +7,7 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
+import { GITHUB_USERNAME } from "@/lib/constants";
 
 /** Intervalo mínimo entre sincronizaciones forzadas. */
 const MIN_SYNC_INTERVAL_MS = 10 * 60 * 1000;
@@ -45,11 +46,10 @@ export const Route = createFileRoute("/api/public/sync")({
         }
         lastForcedSyncAt = now;
 
-        const { fetchPortfolio, invalidatePortfolioCache } = await import(
-          "@/infrastructure/github/github-api.server"
-        );
+        const { fetchPortfolio, invalidatePortfolioCache } =
+          await import("@/infrastructure/github/github-api.server");
         invalidatePortfolioCache();
-        const snapshot = await fetchPortfolio("santiagonieto09");
+        const snapshot = await fetchPortfolio(GITHUB_USERNAME);
 
         return json({
           ok: true,

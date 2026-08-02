@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-
-export const GITHUB_USERNAME = "santiagonieto09";
+import { GITHUB_USERNAME } from "./constants";
 
 export const getPortfolio = createServerFn({ method: "GET" }).handler(async () => {
   const { fetchPortfolio } = await import("@/infrastructure/github/github-api.server");

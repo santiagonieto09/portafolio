@@ -3,14 +3,13 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Github, Mail } from "lucide-react";
 
 import { portfolioQueryOptions } from "@/lib/portfolio.queries";
+import { CONTACT_EMAIL, GITHUB_PROFILE_URL, GITHUB_USERNAME } from "@/lib/constants";
 import { ProfileHero } from "@/components/portfolio/profile-hero";
 import { StatsGrid } from "@/components/portfolio/stats-grid";
 import { LanguageChart } from "@/components/portfolio/language-chart";
 import { RepositoryExplorer } from "@/components/portfolio/repository-explorer";
 import { ActivityFeed } from "@/components/portfolio/activity-feed";
 import { SiteHeader } from "@/components/portfolio/site-header";
-
-
 const TITLE = "Santiago Nieto — Portafolio de desarrollo de software";
 const DESCRIPTION =
   "Portafolio profesional de Santiago Nieto: proyectos, tecnologías, releases y estadísticas sincronizadas automáticamente desde GitHub.";
@@ -53,11 +52,11 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "Person",
           name: "Santiago Nieto",
-          alternateName: "santiagonieto09",
+          alternateName: GITHUB_USERNAME,
           jobTitle: "Desarrollador de software",
           address: { "@type": "PostalAddress", addressCountry: "CO" },
           image: "https://avatars.githubusercontent.com/u/91501165?v=4",
-          sameAs: ["https://github.com/santiagonieto09"],
+          sameAs: [GITHUB_PROFILE_URL],
           knowsAbout: ["Java", "Spring Boot", "Flutter", "Angular", "Python", "TypeScript"],
         }),
       },
@@ -92,7 +91,7 @@ function PortfolioPage() {
           </div>
           <div className="flex items-center gap-2">
             <a
-              href="mailto:santiago.nieto09@gmail.com"
+              href={`mailto:${CONTACT_EMAIL}`}
               className="skeu-btn text-xs"
               aria-label="Escribir un correo a Santiago Nieto"
             >
